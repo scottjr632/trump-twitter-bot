@@ -1,0 +1,10 @@
+app/__pycache__
+.vscode
+requests/auth.json
+requests/request.json
+.env
+lib
+include
+examples
+bin
+.Python
