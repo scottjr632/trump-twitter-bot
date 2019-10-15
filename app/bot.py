@@ -31,7 +31,6 @@ class TweetExtractor(object):
     def _retrieve_latest_tweets_resp(self, min_position: str) -> dict:
         print('getting tweets URL: %s' % self.url.format(self.min_position))
         resp = requests.get(self.url.format(self.min_position))
-        print(resp)
         if resp.status_code != 200:
             return self.__handle_execption__(resp)
         
@@ -109,12 +108,9 @@ class TrumpBotWithMongo(TrumpBotMessenger):
         return Tweet.objects.count()
 
     def send_latest_tweets(self):
-        print('Sending tweets')
         min_position = Tweet.objects.get_last_tweet_id()
-        print('min_position: %s' % min_position)
         self._set_min_position(min_position)
         tweets = super().send_latest_tweets()
-        print('Sending %s tweets' % len(tweets))
         for tweet in tweets:
             print('saved tweet %s' % tweet.tweet_id)
             tweet.save()
