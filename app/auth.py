@@ -4,7 +4,7 @@ import json
 
 class _AuthInfo:
     """ _AuthInfo is a private class used to store
-    credentials from a auth file """
+    credentials from an auth file """
     url = ''
     username = ''
     password = ''
@@ -28,6 +28,19 @@ class Authentication(object):
         self._file_path = auth_file_path
         self.auth_token = None
 
+    def _merge_kwargs_with_headers(self, **kwargs) -> dict:
+        """
+        Returns a merged copy of kwargs and the header dict. This is useful when trying
+        to pass the newly updated Bearer headers for authentication.
+
+        allows us to overwrite the previous result of self.get_bearer_header() with
+        the new function that returns the updated bearer token but still allows passing
+        of other arguments.
+
+        Should be spread with the ** operator when passing as argument to a function.
+         """
+        return {**kwargs, 'headers': self.get_bearer_header()}
+
     def get_auth_token(self) -> int:
         """ 
         Uses credentials stores in file given as `file_path`
@@ -43,7 +56,7 @@ class Authentication(object):
         return resp.status_code
 
     def get_bearer_header(self) -> dict:
-        """ Returns a dict with the Authentication header. E.G. Authorization Bearer {auth_token} """
+        """ Returns { 'Authorization': 'Bearer {self.auth_token}' } """
         return {'Authorization': 'Bearer %s' % self.auth_token}
 
     def rebounce_on_401(self, fn, *args, **kwargs) -> int:
@@ -56,10 +69,12 @@ class Authentication(object):
         It will return the response code after 10 attempts """
         attempts = 0
         resp_code = fn(*args, **kwargs)
-        while resp_code == 401 and attempts < 10:
+        while resp_code == 401 and attempts <= 10:
             print('Trying to authenticate %s\t Attempts: %s' % (resp_code, attempts))
-            self.get_auth_token()
-            resp_code = fn(*args, **kwargs)
+            if self.get_auth_token() == 401:
+                raise Exception('Unable to authenticate using given credentials in %s' % self._file_path)
+
+            resp_code = fn(*args, **self._merge_kwargs_with_headers(**kwargs))
             attempts += 1
 
         return resp_code
