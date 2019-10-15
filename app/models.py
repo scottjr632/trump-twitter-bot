@@ -27,7 +27,7 @@ class TweetQuerySet(mongo.QuerySet):
         return self.order_by('-tweet_id').all()
 
     def get_all_bad_responses(self):
-        return self.filter(response_code__gt=201)
+        return self.filter(response_code__gt=200)
 
     def get_filtered_tweets(self):
         return self.only('date_created', 'response_code', 'content', 'tweet_id')
