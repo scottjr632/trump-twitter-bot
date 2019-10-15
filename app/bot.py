@@ -75,10 +75,17 @@ class TrumpBotMessenger(TweetExtractor):
 
         self._file_path = file_path
         self._request_body = _read_requests_file(file_path)
+
+    def __clean_content__(self, content: str) -> str:
+        return content.replace('\n', ' ').replace('"', '`')
         
     def __send_tweet_msg__(self, content: str, headers=None) -> int:
+        """ Responsible for sending the post requests that contains the content of the 
+        tweet and the data from the request.json file.
+
+        This function can be overwritten to change the way that sends happen. """
         print('sending message\nContent: %s\nHeaders: %s' % (content, headers))
-        msg = self._request_body.replace('{{ content }}', content.replace('\n', ' '))
+        msg = self._request_body.replace('{{ content }}', self.__clean_content__(content))
         msg_body = json.loads(msg)
         request_url = msg_body['url']
         if request_url is None:
@@ -101,11 +108,17 @@ class TrumpBotWithMongo(TrumpBotMessenger):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def get_last_ten(self):
-        return Tweet.objects.get_last_ten()
+    def resend_bad_tweets(self):
+        tweets = Tweet.objects.get_all_bad_responses()
+        attempts = 0
+        while attempts < 10 and len(tweets) > 0:
+            for tweet in tweets:
+                resp_code = self.__send_tweet_msg__(tweet.content)
+                tweet.update(response_code=resp_code)
+                print('Updated %s\tStatus Code: %s\nContent: %s' % (tweet.tweet_id, resp_code, tweet.content))
 
-    def get_total_tweets(self) -> int:
-        return Tweet.objects.count()
+            tweets = Tweet.objects.get_all_bad_responses()
+            attempts += 1
 
     def send_latest_tweets(self):
         min_position = Tweet.objects.get_last_tweet_id()
@@ -136,9 +149,18 @@ class TrumpBotScheduler(TrumpBot, BackgroundScheduler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def start(self, paused=False, seconds=30, **kwargs):
+    def __add_trump_bot_jobs__(self, seconds, **kwargs):
+        """ 
+        Adds the jobs for the trump bot.
+
+        Can be overwriten to include other jobs. """ 
         self.add_job(self.send_latest_tweets, 'interval', seconds=seconds, max_instances=1, **kwargs)
+        self.add_job(self.resend_bad_tweets, 'interval', seconds=seconds*2, max_instances=1, **kwargs)
+
+    def start(self, paused=False, seconds=30, **kwargs):
+        """ Adds the jobs for the trump bot scheduler and starts APScheduler """
         logging.info('Starting job')
+        self.__add_trump_bot_jobs__(seconds, **kwargs)
         return super().start(paused=paused)
 
 
