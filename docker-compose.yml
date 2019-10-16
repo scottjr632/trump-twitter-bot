@@ -13,7 +13,10 @@ services:
       - "db:database"
     environment:
       - MONGO_DB_URL=mongodb://database:27017/0
-      - PORT=8080
+      - SERVER_PORT=8080
+    volumes:
+      - ./requests/requests.json:/trump-bot/requests/requests.json
+      - ./requests/auth.json:/trump-bot/requests/auth.json
     ports:
       - "11882:8080"
     depends_on:
