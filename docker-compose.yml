@@ -4,15 +4,16 @@ services:
   db:
     image: mongo
     restart: unless-stopped
+    command: mongod --port 27018
     ports:
-      - "27017:27017"
+      - "27018:27018"
   web:
     build: .
     restart: unless-stopped
     links:
       - "db:database"
     environment:
-      - MONGO_DB_URL=mongodb://database:27017/0
+      - MONGO_DB_URL=mongodb://database:27018
       - SERVER_PORT=8080
     volumes:
       - ./requests/requests.json:/trump-bot/requests/requests.json

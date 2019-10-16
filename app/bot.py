@@ -156,10 +156,11 @@ class TrumpBotScheduler(TrumpBot, BackgroundScheduler):
         Can be overwriten to include other jobs. """ 
         self.add_job(self.send_latest_tweets, 'interval', seconds=seconds, max_instances=1, **kwargs)
         self.add_job(self.resend_bad_tweets, 'interval', seconds=seconds*2, max_instances=1, **kwargs)
+        logging.info('Added send_latest_tweets and resend_bad_tweets jobs')
 
     def start(self, paused=False, seconds=30, **kwargs):
         """ Adds the jobs for the trump bot scheduler and starts APScheduler """
-        logging.info('Starting job')
+        logging.info('Starting scheduler')
         self.__add_trump_bot_jobs__(seconds, **kwargs)
         return super().start(paused=paused)
 
