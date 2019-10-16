@@ -9,8 +9,9 @@ from app.models import Tweet
 
 
 def _initialize_trump_bot() -> TrumpBotScheduler:
-    trump_bot = TrumpBotScheduler(file_path='requests/request.json',
-                                auth_file_path='requests/auth.json')
+    requests_path = os.environ.get('REQUESTS_FILE_PATH', 'requests/request.json')
+    auth_path = os.environ.get('AUTH_FILE_PATH', 'requests/auth.json')
+    trump_bot = TrumpBotScheduler(file_path=requests_path, auth_file_path=auth_path)
 
     # this functions initialize the trump bot by getting the latest tweets
     # and trying to send any tweets that contained errors
