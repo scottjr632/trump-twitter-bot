@@ -1,5 +1,6 @@
 import os
 import datetime
+from typing import List
 
 import mongoengine as mongo
 
@@ -24,6 +25,10 @@ class TweetQuerySet(mongo.QuerySet):
     def get_last_tweet_id(self) -> int:
         tweet = self.order_by('-tweet_id').limit(1).first()
         return tweet.tweet_id if tweet is not None else 1111111
+
+    def get_tweets_from_today(self, hours=24):
+        yesterday = datetime.datetime.utcnow() - datetime.timedelta(hours=hours)
+        return self.filter(date_created__gte=yesterday)
 
     def ordered(self):
         return self.order_by('-tweet_id').all()

@@ -14,7 +14,7 @@ configure_app(app, status='production')
 app.add_url_rule('/graphql', view_func=GraphQLView.as_view(
             'graphql',
             schema=schema,
-            explorer=True,
+            pretty=True,
             graphiql=True  # for having the GraphiQL interface
         ))
 
