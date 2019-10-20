@@ -1,13 +1,22 @@
 import os
 
 from flask import Flask, jsonify, send_from_directory
+from flask_graphql import GraphQLView
 
 from .models import Tweet
 from .bot import TrumpBot
 from .config import configure_app
+from .schema import schema
 
 app = Flask(__name__)
 configure_app(app, status='production')
+
+app.add_url_rule('/graphql', view_func=GraphQLView.as_view(
+            'graphql',
+            schema=schema,
+            explorer=True,
+            graphiql=True  # for having the GraphiQL interface
+        ))
 
 
 @app.after_request

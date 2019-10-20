@@ -6,8 +6,6 @@ import mongoengine as mongo
 mongo_url = os.environ.get('MONGO_DB_URL')
 mongo_db = os.environ.get('MONGO_DB_NAME', 0)
 
-print(mongo_url)
-
 mongo.connect(mongo_db, host=mongo_url)
 
 
@@ -15,6 +13,10 @@ class TweetQuerySet(mongo.QuerySet):
 
     def get_all(self):
         return self.all()
+
+    def get_by_tweet_id(self, tweet_id):
+        tweet = self.filter(tweet_id=tweet_id).first()
+        return tweet
 
     def get_last_ten(self):
         return self.all()[:10]
@@ -37,7 +39,7 @@ class Tweet(mongo.Document):
     date_created = mongo.DateTimeField(default=datetime.datetime.utcnow)
     response_code = mongo.IntField(required=True, default=404)
     content = mongo.StringField(required=True)
-    tweet_id = mongo.IntField(required=True)
+    tweet_id = mongo.IntField(required=True, unique=True)
 
     meta = {'queryset_class' : TweetQuerySet}
 

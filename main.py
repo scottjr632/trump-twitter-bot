@@ -9,6 +9,14 @@ from app.bot import TrumpBotScheduler
 from app.models import Tweet
 
 
+class TestScheduler(TrumpBotScheduler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def __send_tweet_msg__(self, content, headers=None):
+        print('Content %s' % content)
+        return 200
+
 
 def _file_path_sanity_check(*args):
     for path in args:
@@ -21,7 +29,7 @@ def _initialize_trump_bot() -> TrumpBotScheduler:
     auth_path = os.environ.get('AUTH_FILE_PATH', 'requests/auth.json')
     _file_path_sanity_check(requests_path, auth_path)
 
-    trump_bot = TrumpBotScheduler(file_path=requests_path, auth_file_path=auth_path)
+    trump_bot = TestScheduler(file_path=requests_path, auth_file_path=auth_path)
 
     # this functions initialize the trump bot by getting the latest tweets
     # and trying to send any tweets that contained errors
