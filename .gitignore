@@ -9,3 +9,5 @@ examples
 bin
 .Python
 .DS_Store
+app/public
+client
