@@ -1,5 +1,6 @@
 import requests
 import json
+import logging
 
 
 class _AuthInfo:
@@ -70,7 +71,7 @@ class Authentication(object):
         attempts = 0
         resp_code = fn(*args, **kwargs)
         while resp_code == 401 and attempts <= 10:
-            print('Trying to authenticate %s\t Attempts: %s' % (resp_code, attempts))
+            logging.info('Trying to authenticate %s\t Attempts: %s' % (resp_code, attempts))
             if self.get_auth_token() == 401:
                 raise Exception('Unable to authenticate using given credentials in %s' % self._file_path)
 

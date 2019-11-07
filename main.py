@@ -11,7 +11,7 @@ import signal
 import subprocess
 from functools import wraps
 
-from app import app
+from app.config import configure_app
 from app.bot import TrumpBotScheduler
 from app.sentimentbot import SentimentBot
 from app.models import Tweet
@@ -69,8 +69,6 @@ def _initialize_trump_bot(auth_path, requests_path,
                           send_posts: bool=True,
                           *args, **kwargs) -> TrumpBotScheduler:
 
-    print('auth_path', auth_path, 'requests_path', requests_path, 'send_posts', send_posts)
-
     trump_bot: TrumpBotScheduler = None
     if send_posts:
         logging.info('Post requests are not being sent.')
@@ -92,6 +90,7 @@ def _initialize_trump_bot(auth_path, requests_path,
     # and trying to send any tweets that contained errors
     trump_bot.send_latest_tweets()
     trump_bot.resend_bad_tweets()
+    logging.info('Trump bot initialization finished... please press ctrl-c to close program if finished.')
     return trump_bot
 
 
@@ -121,8 +120,12 @@ def _start_sentiment_bot(auth_path: str, requests_path: str,
 
 
 def _start_flask_server(*args, **kwargs):
-    logging.info('Starting the flask server...')
+    from app import app
 
+    logging.info('Starting the flask server...')
+    level = os.environ.get('CONFIG_LEVEL')
+
+    configure_app(app, status='production' if level is None else level)
     port = app.config.get('PORT')
     app.run(host='0.0.0.0', port=port)  
 

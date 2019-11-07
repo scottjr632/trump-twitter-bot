@@ -9,7 +9,6 @@ from .config import configure_app
 from .schema import schema
 
 app = Flask(__name__)
-configure_app(app, status='production')
 
 app.add_url_rule('/graphql', view_func=GraphQLView.as_view(
             'graphql',

@@ -31,4 +31,4 @@ class TestingConfig(BaseConfig):
 class ProductionConfig(BaseConfig):
     DEBUG = False
     TESTING = False
-    logging.INFO
+    LOG_LEVEL = logging.INFO

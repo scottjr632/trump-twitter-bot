@@ -29,7 +29,7 @@ class TweetExtractor(object):
         self.min_position = min_position
 
     def _retrieve_latest_tweets_resp(self, min_position: str) -> dict:
-        print('getting tweets URL: %s' % self.url.format(self.min_position))
+        logging.debug('getting tweets URL: %s' % self.url.format(self.min_position))
         resp = requests.get(self.url.format(self.min_position))
         if resp.status_code != 200:
             return self.__handle_execption__(resp)
@@ -55,7 +55,7 @@ class TweetExtractor(object):
         self._set_min_position(new_min_position)
 
     def get_tweets(self) -> List[Tweet]:
-        print('getting tweets')
+        logging.debug('getting tweets')
         unparsed_tweets = self._retrieve_latest_tweets_resp(self.min_position)
         self._set_min_position_from_unparsed_tweets(unparsed_tweets)
 
@@ -84,7 +84,7 @@ class TrumpBotMessenger(TweetExtractor):
         tweet and the data from the request.json file.
 
         This function can be overwritten to change the way that sends happen. """
-        print('sending message\nContent: %s\nHeaders: %s' % (content, headers))
+        logging.debug('sending message\nContent: %s\nHeaders: %s' % (content, headers))
         msg = self._request_body.replace('{{ content }}', self.__clean_content__(content))
         msg_body = json.loads(msg)
         request_url = msg_body['url']
@@ -96,7 +96,7 @@ class TrumpBotMessenger(TweetExtractor):
 
     def send_latest_tweets(self) -> List[Tweet]:
         tweets_text = self.get_tweets()
-        print(len(tweets_text))
+        logging.debug('sent %s tweets' % len(tweets_text))
         for tweet in tweets_text:
             status_code = self.__send_tweet_msg__(tweet.content)
             tweet.response_code = status_code
@@ -115,7 +115,7 @@ class TrumpBotWithMongo(TrumpBotMessenger):
             for tweet in tweets:
                 resp_code = self.__send_tweet_msg__(tweet.content)
                 tweet.update(response_code=resp_code)
-                print('Updated %s\tStatus Code: %s\nContent: %s' % (tweet.tweet_id, resp_code, tweet.content))
+                logging.info('Updated %s\tStatus Code: %s\nContent: %s' % (tweet.tweet_id, resp_code, tweet.content))
 
             tweets = Tweet.objects.get_all_bad_responses()
             attempts += 1
@@ -125,7 +125,7 @@ class TrumpBotWithMongo(TrumpBotMessenger):
         self._set_min_position(min_position)
         tweets = super().send_latest_tweets()
         for tweet in tweets:
-            print('saved tweet %s' % tweet.tweet_id)
+            logging.info('saved tweet %s' % tweet.tweet_id)
             tweet.save()
 
         return tweets
@@ -170,5 +170,4 @@ class TrumpBotTest(TrumpBotScheduler):
         super().__init__(*args, **kwargs)
 
     def __send_tweet_msg__(self, content) -> int:
-        print('sent tweet!')
         return 200

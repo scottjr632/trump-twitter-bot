@@ -1,4 +1,5 @@
 import os
+import logging
 
 config = {
     "development": "app.settings.DevelopmentConfig",
@@ -8,5 +9,14 @@ config = {
 }
 
 
-def configure_app(app, status="default"):
-    app.config.from_object(config[status])
+def _validate_config_status(status: str, default='default') -> str:
+    to_validate = config.get(status)
+    if to_validate is None:
+        logging.warn('Unable to find status: %s. Using default config.' % status)
+        return config.get(default)
+
+    return to_validate
+
+
+def configure_app(app, status='default'):
+    app.config.from_object(_validate_config_status(status))
