@@ -27,14 +27,15 @@ FNCS = []
 
 try:
     os.setpgrp()
+
+    if not os.path.exists(os.path.dirname(PID_FILE_PATH)):
+        os.makedirs(os.path.dirname(PID_FILE_PATH))
+
+    with open(PID_FILE_PATH, 'w+') as file:
+        file.write(str(os.getpgrp()) + '\n')
+
 except Exception as e:
-    raise e
-
-if not os.path.exists(os.path.dirname(PID_FILE_PATH)):
-    os.makedirs(os.path.dirname(PID_FILE_PATH))
-
-with open(PID_FILE_PATH, 'w+') as file:
-    file.write(str(os.getpgrp()) + '\n')
+    logging.error(e)
 
 
 def _file_path_sanity_check(*args):
