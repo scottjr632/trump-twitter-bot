@@ -39,6 +39,9 @@ class TweetQuerySet(mongo.QuerySet):
     def get_filtered_tweets(self):
         return self.only('date_created', 'response_code', 'content', 'tweet_id')
 
+    def search_tweet_content(self, search):
+        return self.search_text(search).order_by('$text_score')
+
 
 class Tweet(mongo.Document):
     date_created = mongo.DateTimeField(default=datetime.datetime.utcnow)
@@ -46,7 +49,16 @@ class Tweet(mongo.Document):
     content = mongo.StringField(required=True)
     tweet_id = mongo.IntField(required=True, unique=True)
 
-    meta = {'queryset_class' : TweetQuerySet}
+    meta = {
+        'queryset_class' : TweetQuerySet,
+        'indexes': [
+            {
+                'fields': ['$content'],
+                'default_language': 'english',
+                'weights': {'content': 10}
+            }
+        ]
+    }
 
     def serialize(self):
         return {

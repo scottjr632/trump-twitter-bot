@@ -37,6 +37,7 @@ class SentimentQuery(ObjectType):
 
 class TwitterQuery(ObjectType):
     tweet_by_id = Field(TweetObj, tweet_id=String(required=True))
+    search_tweets = List(TweetObj, search=String(required=True))
     tweets = List(TweetObj, only_today=Boolean(default_value=True))
     
     def resolve_hello(self, info, name):
@@ -45,6 +46,10 @@ class TwitterQuery(ObjectType):
     def resolve_tweet_by_id(self, info, tweet_id):
         tweet = Tweet.objects.get_by_tweet_id(int(tweet_id))
         return TweetObj(**tweet.serialize()) if tweet is not None else TweetObj()
+
+    def resolve_search_tweets(self, info, search):
+        tweets = Tweet.objects.search_tweet_content(search)
+        return [TweetObj(**tweet.serialize()) for tweet in tweets]
 
     def resolve_tweets(self, info, only_today):
         if only_today:

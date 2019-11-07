@@ -11,3 +11,5 @@ RUN pip3 install -r requirements.txt
 COPY . /trump-bot
 
 ENTRYPOINT [ "python", "main.py" ]
+
+CMD [ "trumpbot" ]
