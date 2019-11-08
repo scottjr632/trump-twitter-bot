@@ -15,5 +15,6 @@ jobs:
           name: Run pytests
           command: |
             coverage run --source app -m pytest
+      - run: coverage html
       - store_artifacts:
-          path: 
+          path: htmlcov/
