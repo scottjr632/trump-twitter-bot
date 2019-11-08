@@ -10,6 +10,8 @@ jobs:
           command: |
             pip3 install -r requirements.txt
   test:
+    docker:
+      - image: python:3.6.8-slim-stretch
     steps:
       - run:
           name: Run pytests
