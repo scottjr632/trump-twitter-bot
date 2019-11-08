@@ -1,4 +1,4 @@
-app/__pycache__
+__pycache__
 .vscode
 requests/auth.json
 requests/request.json
@@ -12,3 +12,7 @@ bin
 app/public
 client
 var
+.pytest_cache/
+.coverage
+.coveragerc
+htmlcov

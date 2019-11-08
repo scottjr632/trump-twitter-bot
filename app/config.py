@@ -12,7 +12,7 @@ config = {
 def _validate_config_status(status: str, default='default') -> str:
     to_validate = config.get(status)
     if to_validate is None:
-        logging.warn('Unable to find status: %s. Using default config.' % status)
+        logging.warning('Unable to find status: %s. Using default config.' % status)
         return config.get(default)
 
     return to_validate
