@@ -28,7 +28,12 @@ def patch_file_open_for_auth_info(monkeypatch):
         def __exit__(self, *args, **kwargs):
             return self
         def read(self):
-            return '{"url": "test", "username": "hello", "password": "test", "token_name": "token"}'
+            return """ {
+                "url": "test", 
+                "username": "hello", 
+                "password": "test", 
+                "token_name": "token"
+            }   """
 
     monkeypatch.setattr('builtins.open', open)
 
@@ -76,27 +81,31 @@ def test_read_auth_info_from_file(patch_file_open_for_auth_info):
     assert auth_info.token_name == 'token'
 
 
-def test_get_auth_token_valid(mock_post_authentication_valid, patch_file_open_for_auth_info, auth_service):
+def test_get_auth_token_valid(mock_post_authentication_valid,
+                              patch_file_open_for_auth_info, auth_service):
     status = auth_service.get_auth_token()
     assert status == 200
     assert auth_service.auth_token == 'token'
 
 
-def test_get_auth_token_invalid(mock_post_authentication_invalid, patch_file_open_for_auth_info, auth_service):
+def test_get_auth_token_invalid(mock_post_authentication_invalid,
+                                patch_file_open_for_auth_info, auth_service):
     status = auth_service.get_auth_token()
     assert status != 200
     assert auth_service.auth_token is None
 
 
-def test_rebounce_on_401_valid(mock_post_authentication_valid, patch_file_open_for_auth_info, auth_service):
+def test_rebounce_on_401_valid(mock_post_authentication_valid,
+                               patch_file_open_for_auth_info, auth_service):
     status = auth_service.rebounce_on_401(lambda *args, **kwargs: 401)
     assert auth_service.auth_token == 'token'
 
 
-def test_rebounce_on_401_invalid_creds(mock_post_authentication_invalid, patch_file_open_for_auth_info, auth_service):
+def test_rebounce_on_401_invalid_creds(mock_post_authentication_invalid,
+                                       patch_file_open_for_auth_info, auth_service):
     with pytest.raises(Exception):
         status = auth_service.rebounce_on_401(lambda *args, **kwargs: 401)
-        
+
         assert status == 401
         assert auth_service.auth_token is None
 
@@ -104,7 +113,7 @@ def test_rebounce_on_401_invalid_creds(mock_post_authentication_invalid, patch_f
 def test_get_bearer_header(auth_service):
     test_token = 'test-token'
     auth_service.auth_token = test_token
-    assert auth_service.get_bearer_header() == {'Authorization': 'Bearer %s' % test_token}
+    assert auth_service.get_bearer_header() == {'Authorization':'Bearer %s' % test_token}
 
 
 def test_fixture(auth_service):
