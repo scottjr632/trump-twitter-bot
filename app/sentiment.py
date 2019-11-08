@@ -3,7 +3,7 @@ from enum import Enum
 from typing import List
 _create_unverified_https_context = ssl._create_unverified_context
 
-import textblob.download_corpora
+import textblob.download_corpora # lgtm [py/unused-import]
 from textblob import TextBlob
 
 from .models import Tweet

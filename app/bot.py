@@ -1,4 +1,3 @@
-import os
 import json
 import logging
 import re
@@ -131,7 +130,7 @@ class TrumpBotWithMongo(TrumpBotMessenger):
         return tweets
 
 
-class TrumpBotWithAuth(Authentication, TrumpBotWithMongo):
+class TrumpBotWithAuth(Authentication, TrumpBotWithMongo): # lgtm [py/missing-call-to-init]
     def __init__(self, auth_file_path='auth.json', *args, **kwargs):
         super().__init__(auth_file_path=auth_file_path, *args, **kwargs)
 

@@ -1,6 +1,5 @@
 import os
 import datetime
-from typing import List
 
 import mongoengine as mongo
 

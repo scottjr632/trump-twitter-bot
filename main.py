@@ -1,20 +1,17 @@
 import os
 import logging
-
-from dotenv import load_dotenv
-load_dotenv(verbose=True)
-
 import argparse
-import os
 import sys
 import signal
 import subprocess
 from functools import wraps
 
+from dotenv import load_dotenv
+load_dotenv(verbose=True)
+
 from app.config import configure_app
 from app.bot import TrumpBotScheduler
 from app.sentimentbot import SentimentBot
-from app.models import Tweet
 
 parser = argparse.ArgumentParser(description=r"""
 """)

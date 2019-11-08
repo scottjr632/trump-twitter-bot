@@ -1,5 +1,4 @@
 import os
-import os
 import logging
 
 from .definitions import ROOT_DIR
