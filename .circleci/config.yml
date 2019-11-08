@@ -9,7 +9,11 @@ jobs:
           name: Install dependencies
           command: |
             pip3 install -r requirements.txt
+  test:
+    steps:
       - run:
-          name: Run tests
+          name: Run pytests
           command: |
-            pytest
+            coverage run --source app -m pytest
+      - store_artifacts:
+          path: 
